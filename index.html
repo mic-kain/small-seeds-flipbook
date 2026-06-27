@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Small Seeds Grow Great Trees - Flipbook</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:radial-gradient(ellipse at center,#2d1a00 0%,#0d0500 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:Georgia,serif;overflow:hidden}
+h1{color:#f5d98b;font-size:clamp(.8em,2.5vw,1.1em);letter-spacing:2px;margin-bottom:10px;text-shadow:0 0 15px #c8860a;text-align:center;padding:0 10px}
+#scene{perspective:2500px;width:min(85vw,85vh);height:min(85vw,85vh)}
+#book{width:100%;height:100%;position:relative;transform-style:preserve-3d}
+.page{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.645,.045,.355,1);cursor:pointer;border-radius:3px 8px 8px 3px}
+.page-front,.page-back{position:absolute;inset:0;backface-visibility:hidden;overflow:hidden;border-radius:3px 8px 8px 3px;box-shadow:4px 0 20px rgba(0,0,0,.7)}
+.page-back{transform:rotateY(180deg);border-radius:8px 3px 3px 8px}
+.page-front img,.page-back img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
+.page.flipped{transform:rotateY(-180deg)}
+#controls{display:flex;align-items:center;gap:16px;margin-top:12px}
+.btn{background:linear-gradient(135deg,#8B4513,#a0522d);color:#f5d98b;border:1px solid rgba(245,217,139,.5);padding:7px 20px;border-radius:30px;font-size:clamp(.75em,2vw,.95em);cursor:pointer;transition:all .2s;font-family:Georgia,serif}
+.btn:hover:not(:disabled){background:linear-gradient(135deg,#a0522d,#c0642d);transform:scale(1.06)}
+.btn:disabled{opacity:.25;cursor:default;transform:none}
+#page-num{color:#f5d98b;font-size:clamp(.7em,1.8vw,.9em);min-width:90px;text-align:center}
+#hint{color:#7a5030;font-size:.7em;margin-top:6px;letter-spacing:1px}
+</style>
+</head>
+<body>
+<h1>&#127807; Small Seeds Grow Great Trees &#127807;</h1>
+<div id="scene"><div id="book"></div></div>
+<div id="controls">
+<button class="btn" id="prev" onclick="turn(-1)" disabled>&#8592; Prev</button>
+<span id="page-num">Cover</span>
+<button class="btn" id="next" onclick="turn(1)">Next &#8594;</button>
+</div>
+<div id="hint">Click page or use buttons | Keyboard arrows</div>
+<script>
+const total=13;
+const imgs=Array.from({length:total},(_,i)=>'images/page-'+String(i+1).padStart(2,'0')+'.png');
+let cur=0;
+const book=document.getElementById('book');
+const pageEls=[];
+imgs.forEach((src,i)=>{
+const p=document.createElement('div');p.className='page';p.style.zIndex=total-i;
+const front=document.createElement('div');front.className='page-front';
+const fi=new Image();fi.src=src;fi.alt='Page '+(i+1);front.appendChild(fi);
+const back=document.createElement('div');back.className='page-back';
+const bi=new Image();bi.src=i+1<total?imgs[i+1]:src;bi.alt='Page '+(i+2);back.appendChild(bi);
+p.appendChild(front);p.appendChild(back);
+p.addEventListener('click',()=>p.classList.contains('flipped')?turn(-1):turn(1));
+book.appendChild(p);pageEls.push(p);
+});
+function turn(dir){
+if(dir===1&&cur<total){pageEls[cur].classList.add('flipped');pageEls[cur].style.zIndex=cur;cur++;if(cur<total)pageEls[cur].style.zIndex=total+1;}
+else if(dir===-1&&cur>0){cur--;pageEls[cur].classList.remove('flipped');pageEls[cur].style.zIndex=total-cur;}
+document.getElementById('prev').disabled=cur===0;
+document.getElementById('next').disabled=cur>=total;
+document.getElementById('page-num').textContent=cur===0?'Cover':cur+' / '+(total-1);
+}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')turn(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')turn(-1);});
+</script>
+</body>
+</html>
